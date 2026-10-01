@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Заполнитель: фото преподавателя 4:5">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef2ff"/>
+      <stop offset="1" stop-color="#e3e9f6"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#2350d6" stroke-opacity=".07" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <rect width="800" height="1000" fill="url(#grid)"/>
+
+  <!-- силуэт человека -->
+  <g fill="#b9c6e4">
+    <circle cx="400" cy="372" r="112"/>
+    <path d="M400 508c-116 0-206 84-224 196-6 38-10 78-10 120v176h468V824c0-42-4-82-10-120-18-112-108-196-224-196z"/>
+  </g>
+  <g fill="#9db0d6" opacity=".65">
+    <path d="M400 508l-96 44-38 448h134z"/>
+    <path d="M400 508l96 44 38 448H400z"/>
+  </g>
+
+  <!-- доска с графиком: намёк на математику -->
+  <g transform="translate(96 782)">
+    <rect width="608" height="132" rx="18" fill="#ffffff" fill-opacity=".9"/>
+    <path d="M60 32v68M118 32v68M176 32v68M234 32v68M292 32v68M350 32v68M408 32v68M466 32v68M524 32v68" stroke="#2350d6" stroke-opacity=".18" stroke-width="2"/>
+    <path d="M60 100V70l58 18 58-40 58 22 58-52 58 30 58-26 58 14 58-20" fill="none" stroke="#2350d6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="348" cy="118" r="9" fill="#b4501e"/>
+  </g>
+
+  <text x="400" y="70" text-anchor="middle" font-family="Manrope, Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#2350d6" fill-opacity=".65">ФОТО ПРЕПОДАВАТЕЛЯ</text>
+  <text x="400" y="104" text-anchor="middle" font-family="Manrope, Segoe UI, Arial, sans-serif" font-size="20" font-weight="500" fill="#4d5560" fill-opacity=".7">замените на 800×1000 (WebP)</text>
+</svg>

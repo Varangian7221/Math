@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Админка — редактирование сайта</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ============================== ЭКРАН ВХОДА ============================== -->
+<div class="login" id="login" hidden>
+  <form class="login__card" id="login-form">
+    <span class="login__mark" aria-hidden="true">∑</span>
+    <h1 class="login__title">Админка сайта</h1>
+    <p class="login__text">Введите пароль, чтобы редактировать тексты и фотографии.</p>
+
+    <div class="warn" id="warn-default" hidden>
+      <b>Сейчас установлен пароль по умолчанию — «admin».</b>
+      Перед публикацией сайта задайте свой: <code>ADMIN_PASSWORD=ваш_пароль node server.js</code>
+    </div>
+
+    <label class="login__label" for="login-pass">Пароль</label>
+    <input class="login__input" id="login-pass" type="password" autocomplete="current-password" required autofocus>
+
+    <p class="login__error" id="login-error" hidden></p>
+
+    <button class="btn btn--primary btn--full" id="login-btn" type="submit">Войти</button>
+  </form>
+</div>
+
+<!-- ============================== АДМИНКА ============================== -->
+<div class="app" id="app" hidden>
+
+  <!-- боковая навигация -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="sidebar__mark" aria-hidden="true">∑</span>
+      <div>
+        <b>Редактор сайта</b>
+        <span>Лендинг репетитора</span>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Разделы сайта">
+      <span class="nav__title">Разделы сайта</span>
+      <a class="nav__link" href="#s-site">Контакты и фото</a>
+      <a class="nav__link" href="#s-hero">Первый экран</a>
+      <a class="nav__link" href="#s-utp">Обещания (УТП)</a>
+      <a class="nav__link" href="#s-pains">Боли</a>
+      <a class="nav__link" href="#s-solution">Решение</a>
+      <a class="nav__link" href="#s-about">Обо мне</a>
+      <a class="nav__link" href="#s-directions">Направления</a>
+      <a class="nav__link" href="#s-why">Почему я</a>
+      <a class="nav__link" href="#s-reviews">Отзывы</a>
+      <a class="nav__link" href="#s-prices">Стоимость</a>
+      <a class="nav__link" href="#s-faq">Вопросы (FAQ)</a>
+      <a class="nav__link" href="#s-cta">Финальный блок</a>
+      <a class="nav__link" href="#s-form">Форма и подвал</a>
+    </nav>
+
+    <div class="sidebar__foot">
+      <p class="sidebar__saved">Последнее сохранение:<br><b id="saved-at">—</b></p>
+      <button class="btn btn--ghost btn--sm" id="logout-btn" type="button">Выйти</button>
+    </div>
+  </aside>
+
+  <!-- рабочая область -->
+  <main class="main">
+
+    <header class="main__head">
+      <div>
+        <h1 class="main__title">Содержимое сайта</h1>
+        <p class="main__sub">Изменения появляются на сайте сразу после нажатия «Сохранить». Перенос строки в тексте = Enter.</p>
+      </div>
+      <div class="main__tools">
+        <button class="btn btn--ghost btn--sm" id="preview-btn" type="button">Открыть сайт</button>
+        <button class="btn btn--ghost btn--sm" id="expand-all" type="button">Развернуть всё</button>
+        <button class="btn btn--ghost btn--sm" id="collapse-all" type="button">Свернуть всё</button>
+      </div>
+    </header>
+
+    <div class="draft" id="draft-bar" hidden>
+      <b>Найден несохранённый черновик</b> — возможно, в прошлый раз вкладка закрылась до сохранения.
+      <button class="btn btn--sm btn--primary" id="draft-apply" type="button">Восстановить</button>
+      <button class="btn btn--sm btn--ghost" id="draft-drop" type="button">Удалить</button>
+    </div>
+
+    <!-- ======== КОНТАКТЫ И ФОТО ======== -->
+    <details class="block" id="s-site" open>
+      <summary class="block__head">
+        <h2>Контакты и фотографии</h2>
+        <span class="block__hint">Имя, телефон, мессенджеры, фото преподавателя</span>
+      </summary>
+      <div class="block__body">
+
+        <div class="grid2">
+          <label class="f">
+            <span class="f__label">Имя и фамилия</span>
+            <input class="f__input" data-path="site.teacherFull" type="text">
+            <span class="f__note">Показывается в шапке, подвале и на первом экране</span>
+          </label>
+
+          <label class="f">
+            <span class="f__label">Подпись под именем</span>
+            <input class="f__input" data-path="site.teacherRole" type="text">
+          </label>
+
+          <label class="f">
+            <span class="f__label">Телефон (как видит посетитель)</span>
+            <input class="f__input" data-path="site.phone" type="text" placeholder="+7 900 000-00-00">
+          </label>
+
+          <label class="f">
+            <span class="f__label">Телефон для ссылки «Позвонить»</span>
+            <input class="f__input" data-path="site.phoneHref" type="text" placeholder="+79000000000">
+            <span class="f__note">Только цифры, без пробелов и плюс можно оставить</span>
+          </label>
+
+          <label class="f">
+            <span class="f__label">Ссылка на Telegram</span>
+            <input class="f__input" data-path="site.telegram" type="text" placeholder="https://t.me/username">
+          </label>
+
+          <label class="f">
+            <span class="f__label">Ссылка на WhatsApp</span>
+            <input class="f__input" data-path="site.whatsapp" type="text" placeholder="https://wa.me/79000000000">
+            <span class="f__note">Только номер после wa.me/</span>
+          </label>
+
+          <label class="f">
+            <span class="f__label">Адрес сайта (для SEO)</span>
+            <input class="f__input" data-path="site.siteUrl" type="text" placeholder="https://math-smirnova.ru">
+            <span class="f__note">Используется в разметке Schema.org для поисковиков</span>
+          </label>
+
+          <label class="f">
+            <span class="f__label">Кнопка в шапке</span>
+            <input class="f__input" data-path="header.cta" type="text">
+          </label>
+        </div>
+
+        <h3 class="sub">Фотографии преподавателя</h3>
+        <p class="sub__note">Загрузите фото — оно автоматически обрежется под нужный размер и сожмётся в WebP. Максимум 12 МБ.</p>
+
+        <div class="grid2">
+          <!-- Первый экран -->
+          <div class="imgbox">
+            <span class="imgbox__label">Первый экран</span>
+            <div class="imgbox__preview" id="preview-hero">
+              <img id="img-hero" alt="Фото преподавателя на первом экране">
+            </div>
+            <div class="imgbox__meta">800 × 1000 (4:5) — портрет, лицо в верхней трети</div>
+            <div class="imgbox__row">
+              <label class="btn btn--ghost btn--sm imgbox__pick" for="file-hero">Выбрать файл</label>
+              <input class="sr-only" id="file-hero" type="file" accept="image/jpeg,image/png,image/webp">
+              <button class="btn btn--link btn--sm" id="reset-hero" type="button">Заглушка</button>
+            </div>
+            <p class="imgbox__status" id="status-hero">Не менялось</p>
+            <div class="imgbox__drop" id="drop-hero">Перетащите фото сюда</div>
+          </div>
+
+          <!-- Обо мне -->
+          <div class="imgbox">
+            <span class="imgbox__label">Блок «Обо мне»</span>
+            <div class="imgbox__preview" id="preview-about">
+              <img id="img-about" alt="Фото преподавателя в блоке Обо мне">
+            </div>
+            <div class="imgbox__meta">720 × 720 (1:1) — квадрат</div>
+            <div class="imgbox__row">
+              <label class="btn btn--ghost btn--sm imgbox__pick" for="file-about">Выбрать файл</label>
+              <input class="sr-only" id="file-about" type="file" accept="image/jpeg,image/png,image/webp">
+              <button class="btn btn--link btn--sm" id="reset-about" type="button">Заглушка</button>
+            </div>
+            <p class="imgbox__status" id="status-about">Не менялось</p>
+            <div class="imgbox__drop" id="drop-about">Перетащите фото сюда</div>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ======== ПЕРВЫЙ ЭКРАН ======== -->
+    <details class="block" id="s-hero">
+      <summary class="block__head">
+        <h2>Первый экран</h2>
+        <span class="block__hint">Заголовок, подзаголовок, кнопка, цифры</span>
+      </summary>
+      <div class="block__body">
+        <label class="f">
+          <span class="f__label">Строка над заголовком</span>
+          <input class="f__input" data-path="hero.eyebrow" type="text">
+        </label>
+        <label class="f">
+          <span class="f__label">Главный заголовок (H1)</span>
+          <textarea class="f__input f__input--area" data-path="hero.title" rows="2"></textarea>
+          <span class="f__note">Ключевая фраза. Enter сделает перенос строки</span>
+        </label>
+        <label class="f">
+          <span class="f__label">Подзаголовок</span>
+          <textarea class="f__input f__input--area" data-path="hero.lead" rows="2"></textarea>
+        </label>
+        <label class="f">
+          <span class="f__label">Текст кнопки</span>
+          <input class="f__input" data-path="hero.cta" type="text">
+        </label>
+        <label class="f">
+          <span class="f__label">Мелкий текст под кнопкой</span>
+          <input class="f__input" data-path="hero.micro" type="text">
+        </label>
+
+        <h3 class="sub">Направления (три плашки)</h3>
+        <div class="grid3">
+          <label class="f"><span class="f__label">Плашка 1</span><input class="f__input" data-path="hero.chips.0" type="text"></label>
+          <label class="f"><span class="f__label">Плашка 2</span><input class="f__input" data-path="hero.chips.1" type="text"></label>
+          <label class="f"><span class="f__label">Плашка 3</span><input class="f__input" data-path="hero.chips.2" type="text"></label>
+        </div>
+
+        <h3 class="sub">Две плавающие карточки на фото</h3>
+        <div class="grid2">
+          <div class="grid2">
+            <label class="f"><span class="f__label">Число (верхняя)</span><input class="f__input" data-path="hero.scoreNum" type="text"></label>
+            <label class="f"><span class="f__label">Подпись</span><textarea class="f__input f__input--area" data-path="hero.scoreLabel" rows="2"></textarea></label>
+          </div>
+          <div class="grid2">
+            <label class="f"><span class="f__label">Число (нижняя)</span><input class="f__input" data-path="hero.expNum" type="text"></label>
+            <label class="f"><span class="f__label">Подпись</span><textarea class="f__input f__input--area" data-path="hero.expLabel" rows="2"></textarea></label>
+          </div>
+        </div>
+
+        <h3 class="sub">Полоса цифр внизу</h3>
+        <div class="grid4">
+          <div class="grid2">
+            <label class="f"><span class="f__label">Цифра 1</span><input class="f__input" data-path="hero.stats.0.num" type="text"></label>
+            <label class="f"><span class="f__label">Подпись 1</span><textarea class="f__input f__input--area" data-path="hero.stats.0.text" rows="2"></textarea></label>
+          </div>
+          <div class="grid2">
+            <label class="f"><span class="f__label">Цифра 2</span><input class="f__input" data-path="hero.stats.1.num" type="text"></label>
+            <label class="f"><span class="f__label">Подпись 2</span><textarea class="f__input f__input--area" data-path="hero.stats.1.text" rows="2"></textarea></label>
+          </div>
+          <div class="grid2">
+            <label class="f"><span class="f__label">Цифра 3</span><input class="f__input" data-path="hero.stats.2.num" type="text"></label>
+            <label class="f"><span class="f__label">Подпись 3</span><textarea class="f__input f__input--area" data-path="hero.stats.2.text" rows="2"></textarea></label>
+          </div>
+          <div class="grid2">
+            <label class="f"><span class="f__label">Цифра 4</span><input class="f__input" data-path="hero.stats.3.num" type="text"></label>
+            <label class="f"><span class="f__label">Подпись 4</span><textarea class="f__input f__input--area" data-path="hero.stats.3.text" rows="2"></textarea></label>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== УТП ======== -->
+    <details class="block" id="s-utp">
+      <summary class="block__head">
+        <h2>Обещания (УТП)</h2>
+        <span class="block__hint">Заголовок и три обещания</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="utp.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><textarea class="f__input f__input--area" data-path="utp.title" rows="2"></textarea></label>
+        </div>
+        <label class="f">
+          <span class="f__label">Текст под заголовком</span>
+          <textarea class="f__input f__input--area" data-path="utp.lead" rows="2"></textarea>
+          <span class="f__note">Чтобы выделить слово, поставьте звёздочки: <code>*почему*</code></span>
+        </label>
+        <h3 class="sub">Карточки</h3>
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Обещание 1</b>
+            <input class="f__input" data-path="utp.cards.0.num" type="text" placeholder="01">
+            <input class="f__input" data-path="utp.cards.0.title" type="text" placeholder="Заголовок">
+            <textarea class="f__input f__input--area" data-path="utp.cards.0.text" rows="2" placeholder="Текст"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Обещание 2</b>
+            <input class="f__input" data-path="utp.cards.1.num" type="text" placeholder="02">
+            <input class="f__input" data-path="utp.cards.1.title" type="text" placeholder="Заголовок">
+            <textarea class="f__input f__input--area" data-path="utp.cards.1.text" rows="2" placeholder="Текст"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Обещание 3</b>
+            <input class="f__input" data-path="utp.cards.2.num" type="text" placeholder="03">
+            <input class="f__input" data-path="utp.cards.2.title" type="text" placeholder="Заголовок">
+            <textarea class="f__input f__input--area" data-path="utp.cards.2.text" rows="2" placeholder="Текст"></textarea>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== БОЛИ ======== -->
+    <details class="block" id="s-pains">
+      <summary class="block__head">
+        <h2>Боли</h2>
+        <span class="block__hint">Что происходит и к чему приводит</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="pains.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><input class="f__input" data-path="pains.title" type="text"></label>
+        </div>
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Ситуация 1</b>
+            <textarea class="f__input f__input--area" data-path="pains.items.0.text" rows="2" placeholder="Что происходит"></textarea>
+            <label class="f__sub">К чему приводит</label>
+            <textarea class="f__input f__input--area" data-path="pains.items.0.result" rows="2"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Ситуация 2</b>
+            <textarea class="f__input f__input--area" data-path="pains.items.1.text" rows="2" placeholder="Что происходит"></textarea>
+            <label class="f__sub">К чему приводит</label>
+            <textarea class="f__input f__input--area" data-path="pains.items.1.result" rows="2"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Ситуация 3</b>
+            <textarea class="f__input f__input--area" data-path="pains.items.2.text" rows="2" placeholder="Что происходит"></textarea>
+            <label class="f__sub">К чему приводит</label>
+            <textarea class="f__input f__input--area" data-path="pains.items.2.result" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== РЕШЕНИЕ ======== -->
+    <details class="block" id="s-solution">
+      <summary class="block__head">
+        <h2>Решение</h2>
+        <span class="block__hint">Что делаем и что получает родитель</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="solution.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><input class="f__input" data-path="solution.title" type="text"></label>
+        </div>
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Шаг 1</b>
+            <input class="f__input" data-path="solution.steps.0.title" type="text" placeholder="Что делаем">
+            <textarea class="f__input f__input--area" data-path="solution.steps.0.text" rows="2" placeholder="Подробности"></textarea>
+            <label class="f__sub">Плашка «вы получаете»</label>
+            <input class="f__input" data-path="solution.steps.0.gainTag" type="text" placeholder="вы получаете">
+            <input class="f__input" data-path="solution.steps.0.gain" type="text" placeholder="Что получает родитель">
+          </div>
+          <div class="cardset__item">
+            <b>Шаг 2</b>
+            <input class="f__input" data-path="solution.steps.1.title" type="text" placeholder="Что делаем">
+            <textarea class="f__input f__input--area" data-path="solution.steps.1.text" rows="2" placeholder="Подробности"></textarea>
+            <label class="f__sub">Плашка «вы получаете»</label>
+            <input class="f__input" data-path="solution.steps.1.gainTag" type="text" placeholder="вы получаете">
+            <input class="f__input" data-path="solution.steps.1.gain" type="text" placeholder="Что получает родитель">
+          </div>
+          <div class="cardset__item">
+            <b>Шаг 3</b>
+            <input class="f__input" data-path="solution.steps.2.title" type="text" placeholder="Что делаем">
+            <textarea class="f__input f__input--area" data-path="solution.steps.2.text" rows="2" placeholder="Подробности"></textarea>
+            <label class="f__sub">Плашка «вы получаете»</label>
+            <input class="f__input" data-path="solution.steps.2.gainTag" type="text" placeholder="вы получаете">
+            <input class="f__input" data-path="solution.steps.2.gain" type="text" placeholder="Что получает родитель">
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== ОБО МНЕ ======== -->
+    <details class="block" id="s-about">
+      <summary class="block__head">
+        <h2>Обо мне</h2>
+        <span class="block__hint">Опыт, образование, достижения, цитата</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="about.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><textarea class="f__input f__input--area" data-path="about.title" rows="2"></textarea></label>
+        </div>
+        <label class="f">
+          <span class="f__label">Опыт (первый абзац)</span>
+          <textarea class="f__input f__input--area" data-path="about.lead" rows="3"></textarea>
+        </label>
+        <div class="grid2">
+          <label class="f"><span class="f__label">Плашка «Образование»</span><input class="f__input" data-path="about.eduLabel" type="text"></label>
+          <label class="f">
+            <span class="f__label">Образование</span>
+            <textarea class="f__input f__input--area" data-path="about.edu" rows="2"></textarea>
+            <span class="f__note">Попадает в SEO-разметку Schema.org</span>
+          </label>
+        </div>
+        <label class="f"><span class="f__label">Плашка «Достижения»</span><input class="f__input" data-path="about.achieveLabel" type="text"></label>
+        <div class="grid3">
+          <label class="f"><span class="f__label">Достижение 1</span><input class="f__input" data-path="about.achieve.0" type="text"></label>
+          <label class="f"><span class="f__label">Достижение 2</span><input class="f__input" data-path="about.achieve.1" type="text"></label>
+          <label class="f"><span class="f__label">Достижение 3</span><input class="f__input" data-path="about.achieve.2" type="text"></label>
+        </div>
+        <label class="f">
+          <span class="f__label">Цитата</span>
+          <textarea class="f__input f__input--area" data-path="about.quote" rows="4"></textarea>
+        </label>
+        <div class="grid2">
+          <label class="f"><span class="f__label">Подпись под цитатой</span><input class="f__input" data-path="about.quoteAuthor" type="text"></label>
+          <label class="f"><span class="f__label">Кнопка</span><input class="f__input" data-path="about.cta" type="text"></label>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== НАПРАВЛЕНИЯ ======== -->
+    <details class="block" id="s-directions">
+      <summary class="block__head">
+        <h2>Направления занятий</h2>
+        <span class="block__hint">Четыре карточки</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="directions.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><input class="f__input" data-path="directions.title" type="text"></label>
+        </div>
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Карточка 1</b>
+            <input class="f__input" data-path="directions.items.0.icon" type="text" placeholder="Значок: 7–11">
+            <input class="f__input" data-path="directions.items.0.title" type="text" placeholder="Название">
+            <textarea class="f__input f__input--area" data-path="directions.items.0.text" rows="2"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Карточка 2</b>
+            <input class="f__input" data-path="directions.items.1.icon" type="text" placeholder="Значок: 9">
+            <input class="f__input" data-path="directions.items.1.title" type="text" placeholder="Название">
+            <textarea class="f__input f__input--area" data-path="directions.items.1.text" rows="2"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Карточка 3</b>
+            <input class="f__input" data-path="directions.items.2.icon" type="text" placeholder="Значок: 11">
+            <input class="f__input" data-path="directions.items.2.title" type="text" placeholder="Название">
+            <textarea class="f__input f__input--area" data-path="directions.items.2.text" rows="2"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Карточка 4</b>
+            <input class="f__input" data-path="directions.items.3.icon" type="text" placeholder="Значок: ★">
+            <input class="f__input" data-path="directions.items.3.title" type="text" placeholder="Название">
+            <textarea class="f__input f__input--area" data-path="directions.items.3.text" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== ПОЧЕМУ Я ======== -->
+    <details class="block" id="s-why">
+      <summary class="block__head">
+        <h2>Почему стоит заниматься</h2>
+        <span class="block__hint">Четыре правила работы</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="why.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><textarea class="f__input f__input--area" data-path="why.title" rows="2"></textarea></label>
+        </div>
+        <label class="f"><span class="f__label">Подзаголовок</span><textarea class="f__input f__input--area" data-path="why.lead" rows="2"></textarea></label>
+        <div class="grid2">
+          <label class="f"><span class="f__label">Правило 1</span><input class="f__input" data-path="why.items.0.title" type="text"><textarea class="f__input f__input--area" data-path="why.items.0.text" rows="3"></textarea></label>
+          <label class="f"><span class="f__label">Правило 2</span><input class="f__input" data-path="why.items.1.title" type="text"><textarea class="f__input f__input--area" data-path="why.items.1.text" rows="3"></textarea></label>
+          <label class="f"><span class="f__label">Правило 3</span><input class="f__input" data-path="why.items.2.title" type="text"><textarea class="f__input f__input--area" data-path="why.items.2.text" rows="3"></textarea></label>
+          <label class="f"><span class="f__label">Правило 4</span><input class="f__input" data-path="why.items.3.title" type="text"><textarea class="f__input f__input--area" data-path="why.items.3.text" rows="3"></textarea></label>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== ОТЗЫВЫ ======== -->
+    <details class="block" id="s-reviews">
+      <summary class="block__head">
+        <h2>Отзывы</h2>
+        <span class="block__hint">Три отзыва родителей и выпускников</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="reviews.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><input class="f__input" data-path="reviews.title" type="text"></label>
+        </div>
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Отзыв 1</b>
+            <textarea class="f__input f__input--area" data-path="reviews.items.0.text" rows="4" placeholder="Текст отзыва"></textarea>
+            <input class="f__input" data-path="reviews.items.0.author" type="text" placeholder="Имя, мама Артёма">
+            <input class="f__input" data-path="reviews.items.0.span" type="text" placeholder="9 класс">
+          </div>
+          <div class="cardset__item">
+            <b>Отзыв 2</b>
+            <textarea class="f__input f__input--area" data-path="reviews.items.1.text" rows="4" placeholder="Текст отзыва"></textarea>
+            <input class="f__input" data-path="reviews.items.1.author" type="text" placeholder="Илья, выпускник">
+            <input class="f__input" data-path="reviews.items.1.span" type="text" placeholder="2025">
+          </div>
+          <div class="cardset__item">
+            <b>Отзыв 3</b>
+            <textarea class="f__input f__input--area" data-path="reviews.items.2.text" rows="4" placeholder="Текст отзыва"></textarea>
+            <input class="f__input" data-path="reviews.items.2.author" type="text" placeholder="Елена, мама Софии">
+            <input class="f__input" data-path="reviews.items.2.span" type="text" placeholder="7 класс">
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ======== СТОИМОСТЬ ======== -->
+    <details class="block" id="s-prices">
+      <summary class="block__head">
+        <h2>Стоимость</h2>
+        <span class="block__hint">Тарифы и список пунктов</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="prices.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><input class="f__input" data-path="prices.title" type="text"></label>
+        </div>
+        <label class="f"><span class="f__label">Описание формата</span><textarea class="f__input f__input--area" data-path="prices.lead" rows="2"></textarea></label>
+
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Тариф 1</b>
+            <input class="f__input" data-path="prices.items.0.name" type="text" placeholder="Название тарифа">
+            <div class="grid2">
+              <input class="f__input" data-path="prices.items.0.value" type="text" placeholder="1500 ₽">
+              <input class="f__input" data-path="prices.items.0.unit" type="text" placeholder="/ 60 мин">
+            </div>
+            <input class="f__input" data-path="prices.items.0.flag" type="text" placeholder="Плашка сверху (пусто = не показывать)">
+            <input class="f__input" data-path="prices.items.0.save" type="text" placeholder="Скидка (пусто = не показывать)">
+            <label class="f__sub">Пункты</label>
+            <input class="f__input" data-path="prices.items.0.list.0" type="text">
+            <input class="f__input" data-path="prices.items.0.list.1" type="text">
+            <input class="f__input" data-path="prices.items.0.list.2" type="text">
+          </div>
+
+          <div class="cardset__item">
+            <b>Тариф 2</b>
+            <input class="f__input" data-path="prices.items.1.name" type="text" placeholder="Название тарифа">
+            <div class="grid2">
+              <input class="f__input" data-path="prices.items.1.value" type="text" placeholder="2000 ₽">
+              <input class="f__input" data-path="prices.items.1.unit" type="text" placeholder="/ 90 мин">
+            </div>
+            <input class="f__input" data-path="prices.items.1.flag" type="text" placeholder="Плашка сверху">
+            <input class="f__input" data-path="prices.items.1.save" type="text" placeholder="Скидка">
+            <label class="f__sub">Пункты</label>
+            <input class="f__input" data-path="prices.items.1.list.0" type="text">
+            <input class="f__input" data-path="prices.items.1.list.1" type="text">
+            <input class="f__input" data-path="prices.items.1.list.2" type="text">
+          </div>
+
+          <div class="cardset__item">
+            <b>Тариф 3</b>
+            <input class="f__input" data-path="prices.items.2.name" type="text" placeholder="Название тарифа">
+            <div class="grid2">
+              <input class="f__input" data-path="prices.items.2.value" type="text" placeholder="10 800 ₽">
+              <input class="f__input" data-path="prices.items.2.unit" type="text" placeholder="/ 8 занятий">
+            </div>
+            <input class="f__input" data-path="prices.items.2.flag" type="text" placeholder="Плашка сверху">
+            <input class="f__input" data-path="prices.items.2.save" type="text" placeholder="Скидка">
+            <label class="f__sub">Пункты</label>
+            <input class="f__input" data-path="prices.items.2.list.0" type="text">
+            <input class="f__input" data-path="prices.items.2.list.1" type="text">
+            <input class="f__input" data-path="prices.items.2.list.2" type="text">
+          </div>
+        </div>
+
+        <label class="f"><span class="f__label">Примечание под тарифами</span><input class="f__input" data-path="prices.note" type="text"></label>
+      </div>
+    </details>
+
+    <!-- ======== FAQ ======== -->
+    <details class="block" id="s-faq">
+      <summary class="block__head">
+        <h2>Вопросы (FAQ)</h2>
+        <span class="block__hint">Вопросы попадают в SEO-разметку автоматически</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="faq.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><input class="f__input" data-path="faq.title" type="text"></label>
+        </div>
+        <div class="cardset">
+          <div class="cardset__item">
+            <b>Вопрос 1</b>
+            <input class="f__input" data-path="faq.items.0.q" type="text" placeholder="Вопрос">
+            <textarea class="f__input f__input--area" data-path="faq.items.0.a" rows="3" placeholder="Ответ"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Вопрос 2</b>
+            <input class="f__input" data-path="faq.items.1.q" type="text" placeholder="Вопрос">
+            <textarea class="f__input f__input--area" data-path="faq.items.1.a" rows="3" placeholder="Ответ"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Вопрос 3</b>
+            <input class="f__input" data-path="faq.items.2.q" type="text" placeholder="Вопрос">
+            <textarea class="f__input f__input--area" data-path="faq.items.2.a" rows="3" placeholder="Ответ"></textarea>
+          </div>
+          <div class="cardset__item">
+            <b>Вопрос 4</b>
+            <input class="f__input" data-path="faq.items.3.q" type="text" placeholder="Вопрос">
+            <textarea class="f__input f__input--area" data-path="faq.items.3.a" rows="3" placeholder="Ответ"></textarea>
+          </div>
+        </div>
+        <p class="sub__note">Чтобы вопросы попали в результаты поиска, они должны быть на странице. Google показывает FAQ-разметку не для всех страниц — это не ошибка.</p>
+      </div>
+    </details>
+
+    <!-- ======== ФИНАЛЬНЫЙ CTA ======== -->
+    <details class="block" id="s-cta">
+      <summary class="block__head">
+        <h2>Финальный блок</h2>
+        <span class="block__hint">Призыв к действию и честный триггер</span>
+      </summary>
+      <div class="block__body">
+        <div class="grid2">
+          <label class="f"><span class="f__label">Надзаголовок</span><input class="f__input" data-path="cta.kicker" type="text"></label>
+          <label class="f"><span class="f__label">Заголовок</span><textarea class="f__input f__input--area" data-path="cta.title" rows="2"></textarea></label>
+        </div>
+        <label class="f"><span class="f__label">Текст под заголовком</span><textarea class="f__input f__input--area" data-path="cta.lead" rows="2"></textarea></label>
+        <label class="f">
+          <span class="f__label">Честный триггер срочности</span>
+          <textarea class="f__input f__input--area" data-path="cta.urgency" rows="3"></textarea>
+          <span class="f__note">Плашка с мигающей точкой. Не перебарщивайте с давлением</span>
+        </label>
+        <div class="grid2">
+          <label class="f"><span class="f__label">Снятие риска — заголовок</span><input class="f__input" data-path="cta.riskTitle" type="text"></label>
+          <label class="f"><span class="f__label">Снятие риска — текст</span><textarea class="f__input f__input--area" data-path="cta.riskText" rows="3"></textarea></label>
+        </div>
+        <div class="grid2">
+          <label class="f"><span class="f__label">Кнопка Telegram</span><input class="f__input" data-path="cta.telegramBtn" type="text"></label>
+          <label class="f"><span class="f__label">Кнопка WhatsApp</span><input class="f__input" data-path="cta.whatsappBtn" type="text"></label>
+        </div>
+        <label class="f"><span class="f__label">Подпись под кнопками</span><input class="f__input" data-path="cta.or" type="text"></label>
+      </div>
+    </details>
+
+    <!-- ======== ФОРМА И ПОДВАЛ ======== -->
+    <details class="block" id="s-form">
+      <summary class="block__head">
+        <h2>Форма и подвал</h2>
+        <span class="block__hint">Кнопки отправки, текст подтверждения</span>
+      </summary>
+      <div class="block__body">
+        <label class="f"><span class="f__label">Заголовок формы</span><input class="f__input" data-path="form.title" type="text"></label>
+        <label class="f"><span class="f__label">Текст кнопки отправки</span><input class="f__input" data-path="form.submit" type="text"></label>
+        <label class="f">
+          <span class="f__label">Текст после отправки</span>
+          <textarea class="f__input f__input--area" data-path="form.successText" rows="2"></textarea>
+        </label>
+        <div class="grid2">
+          <label class="f"><span class="f__label">Кнопка календаря</span><input class="f__input" data-path="form.calendarBtn" type="text"></label>
+          <label class="f"><span class="f__label">Кнопка Telegram (после отправки)</span><input class="f__input" data-path="form.telegramBtn" type="text"></label>
+        </div>
+        <label class="f"><span class="f__label">Ссылка «Политика конфиденциальности»</span><input class="f__input" data-path="form.privacyLabel" type="text"></label>
+        <label class="f"><span class="f__label">Текст в подвале</span><textarea class="f__input f__input--area" data-path="footer.about" rows="3"></textarea></label>
+        <label class="f"><span class="f__label">Конец копирайта</span><input class="f__input" data-path="footer.copyright" type="text"></label>
+
+        <h3 class="sub">Настройки Telegram-бота</h3>
+        <p class="sub__note">Это технические настройки — в файле <code>js/config.js</code>. В админке они не меняются, чтобы не сломать отправку заявок.</p>
+        <p class="sub__note">Если бот настроен, заявки приходят вам в Telegram автоматически. Если нет — посетителю показывается кнопка «Отправить в Telegram» с готовым текстом.</p>
+      </div>
+    </details>
+
+  </main>
+
+  <!-- панель сохранения -->
+  <div class="savebar" id="save-bar">
+    <span class="savebar__status" id="save-status">Все изменения сохранены</span>
+    <div class="savebar__actions">
+      <button class="btn btn--ghost btn--sm" id="discard-btn" type="button">Отменить правки</button>
+      <button class="btn btn--primary" id="save-btn" type="button" disabled>Сохранить</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/admin.js" defer></script>
+</body>
+</html>
