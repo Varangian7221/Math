@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Редактор сайта — Math</title>
+</head>
+<body>
+  <!--
+    Decap CMS — редактор контента для статического хостинга (Netlify).
+
+    Как это работает:
+      • вы входите через «Войти с GitHub» (обычная авторизация GitHub);
+      • все правки сохраняются в data/content.json в репозитории;
+      • Netlify видит коммит и сам пересобирает сайт.
+
+    Если страница белая — откройте консоль (F12) и посмотрите ошибки.
+  -->
+  <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
+  <script>
+    (function () {
+      // Домен сайта на Netlify. Нужен, чтобы админка знала, куда стучаться.
+      // Если переименуете сайт на Netlify — поменяйте значение здесь.
+      var CMS_URL = 'https://mathlastname.netlify.app';
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.setSiteUrl(CMS_URL);
+      }
+      window.CMS_MANUAL_INIT = true;
+      CMS.init({
+        config: {
+          backend: {
+            name: 'github',
+            repo: 'Varangian7221/Math',
+            branch: 'main',
+            base_url: 'https://api.netlify.com'
+          },
+          publish_mode: 'simple',
+          media_folder: 'images/uploads',
+          public_folder: '/images/uploads',
+          locale: 'ru'
+        }
+      });
+
+      // Если Netlify Identity всё-таки включена — убираем её кнопки,
+      // чтобы не путались с основным входом через GitHub
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('init', function (user, getToken) {
+          if (!user) {
+            window.netlifyIdentity.close();
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

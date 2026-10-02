@@ -1,9 +1,14 @@
+# Decap CMS — вход через GitHub OAuth (не требует Netlify Identity)
 backend:
-  name: git-gateway
+  name: github
+  repo: Varangian7221/Math
   branch: main
+  # Netlify выступает как посредник для OAuth — это снимает необходимость
+  # поднимать свой сервер авторизации
+  base_url: https://api.netlify.com
+
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
-publish_mode: editorial_workflow
 locale: ru
 
 collections:
