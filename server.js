@@ -236,7 +236,7 @@ async function serveStatic(req, res, pathname) {
 
   if (isHtml) {
     let html = await fsp.readFile(full, 'utf8');
-    if (rel === '/index.html' || rel === '/admin.html') html = injectContent(html);
+    if (rel === '/index.html' || rel === '/admin-node.html') html = injectContent(html);
     res.writeHead(200, headers);
     return res.end(html);
   }
@@ -420,7 +420,7 @@ server.listen(PORT, HOST, () => {
   console.log('  Лендинг преподавателя математики');
   console.log('  ─────────────────────────────────────────────');
   console.log('  Сайт:     http://localhost:' + PORT + '/');
-  console.log('  Админка:  http://localhost:' + PORT + '/admin.html');
+  console.log('  Админка:  http://localhost:' + PORT + '/admin-node.html');
   console.log('');
 
   if (USING_DEFAULT_PW) {
