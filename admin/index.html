@@ -11,47 +11,13 @@
     Decap CMS — редактор контента для статического хостинга (Netlify).
 
     Как это работает:
-      • вы входите через «Войти с GitHub» (обычная авторизация GitHub);
+      • вход через «Войти с GitHub» (обычная авторизация GitHub, Netlify Identity не нужна);
       • все правки сохраняются в data/content.json в репозитории;
       • Netlify видит коммит и сам пересобирает сайт.
 
-    Если страница белая — откройте консоль (F12) и посмотрите ошибки.
+    Настройки берутся из соседнего файла config.yml — Decap подхватывает его сам,
+    поэтому никакого ручного CMS.init() здесь быть не должно.
   -->
   <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
-  <script>
-    (function () {
-      // Домен сайта на Netlify. Нужен, чтобы админка знала, куда стучаться.
-      // Если переименуете сайт на Netlify — поменяйте значение здесь.
-      var CMS_URL = 'https://mathlastname.netlify.app';
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.setSiteUrl(CMS_URL);
-      }
-      window.CMS_MANUAL_INIT = true;
-      CMS.init({
-        config: {
-          backend: {
-            name: 'github',
-            repo: 'Varangian7221/Math',
-            branch: 'main',
-            base_url: 'https://api.netlify.com'
-          },
-          publish_mode: 'simple',
-          media_folder: 'images/uploads',
-          public_folder: '/images/uploads',
-          locale: 'ru'
-        }
-      });
-
-      // Если Netlify Identity всё-таки включена — убираем её кнопки,
-      // чтобы не путались с основным входом через GitHub
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', function (user, getToken) {
-          if (!user) {
-            window.netlifyIdentity.close();
-          }
-        });
-      }
-    })();
-  </script>
 </body>
 </html>
