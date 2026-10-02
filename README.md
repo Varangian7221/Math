@@ -41,7 +41,7 @@ Math/
 
 | Хостинг | Адрес | Технология |
 |---|---|---|
-| Netlify (ваш текущий) | `/admin/` | Decap CMS, вход через GitHub |
+| Netlify (ваш текущий) | `/admin/` | Decap CMS + Netlify Identity (Git Gateway) |
 | Render / Railway / VPS | `/admin-node.html` | Своя админка, вход по паролю |
 
 Обе редактируют **весь текст сайта + фотографии** и пишут в `data/content.json`.
@@ -151,10 +151,10 @@ API: `/api/content` (GET/PUT), `/api/login`, `/api/logout`, `/api/session`,
 
 | Файл | О чём |
 |---|---|
-| `docs/НАСТРОЙКА_GITHUB_OAUTH.md` | **← актуальная настройка входа в `/admin/`** |
+| `docs/НАСТРОЙКА_ВХОДА_В_АДМИНКУ.md` | **← актуальная настройка входа в `/admin/`** |
 | `docs/ИНСТРУКЦИЯ_ЗАГРУЗКИ_РЕПОЗИТОРИЯ_GITHUB.md` | как залить проект на GitHub |
 | `docs/КОНФЛИКТ_ADMIN_HTML_VS_DECAP_CMS.md` | почему `/admin/` показывал не ту админку |
-| остальные `*.md` | история трублюшнга Netlify Identity и Git Gateway |
+| остальные `*.md` | история неудачных попыток настроить вход |
 
-> ⚠️ Файлы про Netlify Identity и Git Gateway **устарели** — Identity больше не
-> используется, вход идёт через GitHub OAuth.
+> ⚠️ Остальные файлы в `docs/` **устарели** — они описывают проблемы, которые на
+> самом деле вызывались багом с `/admin/` (см. `docs/КОНФЛИКТ_ADMIN_HTML_VS_DECAP_CMS.md`).
