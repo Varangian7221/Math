@@ -1,0 +1,276 @@
+backend:
+  name: git-gateway
+  branch: main
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+publish_mode: editorial_workflow
+locale: ru
+
+collections:
+  - name: "content"
+    label: "Контент сайта"
+    label_singular: "Страница"
+    folder: "data"
+    files:
+      - label: "Главный контент"
+        name: "content"
+        file: "data/content.json"
+        format: "json"
+        editor:
+          preview: false
+        fields:
+          - label: "Версия"
+            name: "version"
+            widget: "number"
+            default: 1
+            min: 1
+            step: 1
+            hint: "Техническое поле, можно не трогать"
+          - label: "Дата обновления"
+            name: "updatedAt"
+            widget: "hidden"
+          - label: "Сайт (контакты)"
+            name: "site"
+            widget: "object"
+            collapsed: false
+            fields:
+              - { label: "Имя и фамилия", name: "teacherFull", widget: "string" }
+              - { label: "Должность", name: "teacherRole", widget: "string" }
+              - { label: "Телефон (текст)", name: "phone", widget: "string", hint: "Например: +7 900 000-00-00" }
+              - { label: "Телефон (ссылка)", name: "phoneHref", widget: "string", hint: "Только цифры: +79000000000" }
+              - { label: "Telegram", name: "telegram", widget: "string", hint: "https://t.me/username" }
+              - { label: "Telegram (@username)", name: "telegramShort", widget: "string" }
+              - { label: "WhatsApp", name: "whatsapp", widget: "string", hint: "https://wa.me/79000000000" }
+              - { label: "Email", name: "email", widget: "string" }
+              - { label: "Адрес сайта (SEO)", name: "siteUrl", widget: "string", hint: "https://ваш-домен.ru" }
+          - label: "Шапка"
+            name: "header"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Кнопка в шапке", name: "cta", widget: "string" }
+          - label: "Первый экран"
+            name: "hero"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "eyebrow", widget: "string" }
+              - { label: "Заголовок H1", name: "title", widget: "text" }
+              - { label: "Подзаголовок", name: "lead", widget: "text" }
+              - label: "Плашки (3)"
+                name: "chips"
+                widget: "list"
+                min: 3
+                max: 3
+                fields: [ { label: "Текст", name: "text", widget: "string" } ]
+              - { label: "Кнопка", name: "cta", widget: "string" }
+              - { label: "Микротекст под кнопкой", name: "micro", widget: "string" }
+              - { label: "Карточка 1 — число", name: "scoreNum", widget: "string" }
+              - { label: "Карточка 1 — подпись", name: "scoreLabel", widget: "text" }
+              - { label: "Карточка 2 — число", name: "expNum", widget: "string" }
+              - { label: "Карточка 2 — подпись", name: "expLabel", widget: "text" }
+              - label: "Полоса цифр (4)"
+                name: "stats"
+                widget: "list"
+                min: 4
+                max: 4
+                fields:
+                  - { label: "Число", name: "num", widget: "string" }
+                  - { label: "Подпись", name: "text", widget: "text" }
+          - label: "УТП"
+            name: "utp"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "text" }
+              - { label: "Текст под заголовком", name: "lead", widget: "text" }
+              - label: "Карточки (3)"
+                name: "cards"
+                widget: "list"
+                min: 3
+                max: 3
+                fields:
+                  - { label: "Номер", name: "num", widget: "string" }
+                  - { label: "Заголовок", name: "title", widget: "string" }
+                  - { label: "Текст", name: "text", widget: "text" }
+          - label: "Боли"
+            name: "pains"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Пункты (3)"
+                name: "items"
+                widget: "list"
+                min: 3
+                max: 3
+                fields:
+                  - { label: "Что происходит", name: "text", widget: "text" }
+                  - { label: "К чему приводит", name: "result", widget: "text" }
+          - label: "Решение"
+            name: "solution"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Шаги (3)"
+                name: "steps"
+                widget: "list"
+                min: 3
+                max: 3
+                fields:
+                  - { label: "Заголовок шага", name: "title", widget: "string" }
+                  - { label: "Текст шага", name: "text", widget: "text" }
+                  - { label: "Тег «вы получаете»", name: "gainTag", widget: "string" }
+                  - { label: "Что получаете", name: "gain", widget: "string" }
+          - label: "Обо мне"
+            name: "about"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "text" }
+              - { label: "Лид-текст", name: "lead", widget: "text" }
+              - { label: "Подпись «Образование»", name: "eduLabel", widget: "string" }
+              - { label: "Образование", name: "edu", widget: "text" }
+              - { label: "Подпись «Достижения»", name: "achieveLabel", widget: "string" }
+              - label: "Достижения (3)"
+                name: "achieve"
+                widget: "list"
+                min: 3
+                max: 3
+                fields: [ { label: "Пункт", name: "text", widget: "string" } ]
+              - { label: "Цитата", name: "quote", widget: "text" }
+              - { label: "Автор цитаты", name: "quoteAuthor", widget: "string" }
+              - { label: "Кнопка", name: "cta", widget: "string" }
+          - label: "Направления"
+            name: "directions"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Карточки (4)"
+                name: "items"
+                widget: "list"
+                min: 4
+                max: 4
+                fields:
+                  - { label: "Иконка/цифра", name: "icon", widget: "string" }
+                  - { label: "Заголовок", name: "title", widget: "string" }
+                  - { label: "Текст", name: "text", widget: "text" }
+          - label: "Почему со мной"
+            name: "why"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "text" }
+              - { label: "Подзаголовок", name: "lead", widget: "text" }
+              - label: "Пункты (4)"
+                name: "items"
+                widget: "list"
+                min: 4
+                max: 4
+                fields:
+                  - { label: "Заголовок", name: "title", widget: "string" }
+                  - { label: "Текст", name: "text", widget: "text" }
+          - label: "Отзывы"
+            name: "reviews"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Отзывы (3)"
+                name: "items"
+                widget: "list"
+                min: 3
+                max: 3
+                fields:
+                  - { label: "Текст отзыва", name: "text", widget: "text" }
+                  - { label: "Автор", name: "author", widget: "string" }
+                  - { label: "Подпись", name: "span", widget: "string" }
+          - label: "Стоимость"
+            name: "prices"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Описание", name: "lead", widget: "text" }
+              - label: "Тарифы (3)"
+                name: "items"
+                widget: "list"
+                min: 3
+                max: 3
+                fields:
+                  - { label: "Название тарифа", name: "name", widget: "string" }
+                  - { label: "Цена", name: "value", widget: "string" }
+                  - { label: "Единица", name: "unit", widget: "string" }
+                  - { label: "Флаг (сверху)", name: "flag", widget: "string", required: false, hint: "Оставьте пустым, чтобы не показывать" }
+                  - { label: "Скидка", name: "save", widget: "string", required: false, hint: "Оставьте пустым, чтобы не показывать" }
+                  - label: "Список услуг"
+                    name: "list"
+                    widget: "list"
+                    min: 1
+                    max: 5
+                    fields: [ { label: "Пункт", name: "text", widget: "string" } ]
+              - { label: "Примечание", name: "note", widget: "string" }
+          - label: "FAQ"
+            name: "faq"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Вопросы (4)"
+                name: "items"
+                widget: "list"
+                min: 4
+                max: 4
+                fields:
+                  - { label: "Вопрос", name: "q", widget: "string" }
+                  - { label: "Ответ", name: "a", widget: "text" }
+          - label: "Финальный CTA"
+            name: "cta"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Надзаголовок", name: "kicker", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "text" }
+              - { label: "Лид-текст", name: "lead", widget: "text" }
+              - { label: "Триггер срочности", name: "urgency", widget: "text" }
+              - { label: "Снятие риска — заголовок", name: "riskTitle", widget: "string" }
+              - { label: "Снятие риска — текст", name: "riskText", widget: "text" }
+              - { label: "Кнопка Telegram", name: "telegramBtn", widget: "string" }
+              - { label: "Кнопка WhatsApp", name: "whatsappBtn", widget: "string" }
+              - { label: "Текст между кнопками и формой", name: "or", widget: "string" }
+          - label: "Форма и подвал"
+            name: "form"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Заголовок формы", name: "title", widget: "string" }
+              - { label: "Кнопка отправки", name: "submit", widget: "string" }
+              - { label: "Текст после отправки", name: "successText", widget: "text" }
+              - { label: "Кнопка календаря", name: "calendarBtn", widget: "string" }
+              - { label: "Кнопка Telegram (после отправки)", name: "telegramBtn", widget: "string" }
+              - { label: "Текст «Политика конфиденциальности»", name: "privacyLabel", widget: "string" }
+          - label: "Подвал"
+            name: "footer"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Текст в подвале", name: "about", widget: "text" }
+              - { label: "Копирайт", name: "copyright", widget: "string" }
+          - label: "Изображения"
+            name: "images"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Фото на первом экране", name: "hero", widget: "image", allow_multiple: false, choose_url: false, media_library: { config: { multiple: false } } }
+              - { label: "Фото в блоке «Обо мне»", name: "about", widget: "image", allow_multiple: false, choose_url: false, media_library: { config: { multiple: false } } }
