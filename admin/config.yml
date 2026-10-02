@@ -1,11 +1,12 @@
-# Decap CMS — вход через GitHub OAuth (не требует Netlify Identity)
+# Decap CMS на Netlify.
+#
+# ВАЖНО: используется именно git-gateway, а не `github`.
+# Схема `github` + `base_url: https://api.netlify.com` в Decap 3.16 нерабочая:
+# она стучится на api.netlify.com/auth — этот endpoint у Netlify больше не существует (404).
+# git-gateway ходит в /.netlify/git и /.netlify/identity — штатный путь Netlify.
 backend:
-  name: github
-  repo: Varangian7221/Math
+  name: git-gateway
   branch: main
-  # Netlify выступает как посредник для OAuth — это снимает необходимость
-  # поднимать свой сервер авторизации
-  base_url: https://api.netlify.com
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
