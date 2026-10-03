@@ -1,13 +1,14 @@
-# Decap CMS на Netlify.
+# Decap CMS на Cloudflare.
 #
-# ВАЖНО: используется именно git-gateway, а не `github`.
-# Схема `github` + `base_url: https://api.netlify.com` в Decap 3.16 нерабочая:
-# она стучится на api.netlify.com/auth — этот endpoint у Netlify больше не существует (404).
-# git-gateway ходит в /.netlify/git и /.netlify/identity — штатный путь Netlify.
-
-# backend:
-#   name: git-gateway
-#   branch: main
+# ВАЖНО: используется backend `github` + собственный OAuth-прокси (Cloudflare Worker
+# https://github.com/sterlingwes/decap-proxy). Схема `github` без `base_url` нерабочая —
+# Decap по умолчанию стучится на api.netlify.com/auth, а этот endpoint больше не существует (404).
+# Backend `git-gateway` работает только на Netlify.
+#
+# ВАЖНО: у коллекции НЕ должно быть ключа `folder`, если используется `files`.
+# В Decap 3.16 проверка идёт как `collection.has("folder") ? collection.get("fields") : ...`
+# — при `folder` + `files` получается undefined.toArray() и CMS падает с
+# "Cannot read properties of undefined (reading 'toArray')". Путь и так задан в `file:`.
 
 backend:
   name: github
@@ -25,7 +26,6 @@ collections:
   - name: "content"
     label: "Контент сайта"
     label_singular: "Страница"
-    folder: "data"
     files:
       - label: "Главный контент"
         name: "content"
