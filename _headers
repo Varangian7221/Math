@@ -1,0 +1,30 @@
+# Cloudflare Workers/Pages — правила кеширования.
+#
+# Зачем: без них Cloudflare отдаёт закэшированную копию index.html
+# (cf-cache-status: HIT), и правки из админки не видны на сайте до
+# истечения срока кеша.
+#
+# HTML и data/content.js кешировать нельзя — это то, что меняет админка.
+/index.html
+  Cache-Control: no-cache, must-revalidate
+
+/*.html
+  Cache-Control: no-cache, must-revalidate
+
+/data/*
+  Cache-Control: no-cache, must-revalidate
+
+/admin/*
+  Cache-Control: no-cache, must-revalidate
+
+# Скрипты и стили — на день, при изменении меняется имя файла или
+# принудительное обновление. Здесь без hash, поэтому короткий срок.
+/js/*
+  Cache-Control: public, max-age=300, must-revalidate
+
+/css/*
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Статика — на месяц.
+/images/*
+  Cache-Control: public, max-age=2592000, immutable
