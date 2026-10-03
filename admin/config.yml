@@ -4,9 +4,18 @@
 # Схема `github` + `base_url: https://api.netlify.com` в Decap 3.16 нерабочая:
 # она стучится на api.netlify.com/auth — этот endpoint у Netlify больше не существует (404).
 # git-gateway ходит в /.netlify/git и /.netlify/identity — штатный путь Netlify.
+
+# backend:
+#   name: git-gateway
+#   branch: main
+
 backend:
-  name: git-gateway
+  name: github
+  repo: Varangian7221/Math
   branch: main
+  base_url: https://decap-proxy.varangian7221.workers.dev
+  auth_endpoint: /auth
+
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
