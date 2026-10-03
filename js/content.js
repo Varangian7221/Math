@@ -93,7 +93,7 @@
       description: role + '. ' + get(CONTENT, 'about.lead'),
       url: siteUrl + '/'
     };
-    if (heroImg) person.image = siteUrl + '/' + heroImg;
+    if (heroImg) person.image = siteUrl + String(heroImg).replace(/^\//, '');
     if (edu) person.alumniOf = { '@type': 'CollegeOrUniversity', name: edu };
     person.knowsAbout = ['Математика', 'ОГЭ', 'ЕГЭ', 'ВПР', 'Олимпиадная математика'];
 
