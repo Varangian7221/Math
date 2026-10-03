@@ -9,6 +9,17 @@
 # В Decap 3.16 проверка идёт как `collection.has("folder") ? collection.get("fields") : ...`
 # — при `folder` + `files` получается undefined.toArray() и CMS падает с
 # "Cannot read properties of undefined (reading 'toArray')". Путь и так задан в `file:`.
+#
+# ВАЖНО (диагностика таймаута входа). base_url обслуживает ТОЛЬКО OAuth-редирект.
+# После получения токена Decap из браузера ходит напрямую в api.github.com:
+#     GET https://api.github.com/user            <- currentUser(), падает здесь
+#     GET https://api.github.com/repos/:owner/:repo <- hasWriteAccess()
+# Оба запроса обёрнуты в таймаут на 60 секунд, при истечении в консоли:
+#     auth.js  Request timed out after 60 seconds
+# Если такое происходит — api.github.com недоступен из вашей сети.
+# Помогает СВОЙ Worker-прокси перед api.github.com + ключ api_root:
+#     api_root: https://<ваш-worker>.workers.dev
+# (именно api_root; ключа api_base_url в Decap 3.16.3 не существует)
 
 backend:
   name: github
