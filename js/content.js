@@ -17,6 +17,8 @@
      <p data-field="hero.lead">                    → заменится ТЕКСТ
      <p data-field="hero.title" class="pre">       → текст, переносы \n сохранятся
      <a data-attr="href" data-field="site.telegram"> → заменится ТОЛЬКО АТРИБУТ
+     <a data-attr="href" data-prefix="mailto:" data-field="site.email">
+                                                    → к адресу добавится префикс
      <img data-field="images.hero">                → заменится src
      <span data-field="prices.items.0.flag" data-hide-empty> → если пусто, скроется
 
@@ -55,7 +57,8 @@
       // 2) атрибут (href, placeholder, title…) — текст не трогаем
       attr = el.getAttribute('data-attr');
       if (attr) {
-        el.setAttribute(attr, val);
+        var prefix = el.getAttribute('data-prefix');
+        el.setAttribute(attr, prefix ? prefix + val : val);
         continue;
       }
 

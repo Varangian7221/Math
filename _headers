@@ -4,8 +4,15 @@
 # (cf-cache-status: HIT), и правки из админки не видны на сайте до
 # истечения срока кеша.
 #
-# HTML и data/content.js кешировать нельзя — это то, что меняет админка.
+# HTML и data/content.json кешировать нельзя — это то, что меняет админка.
+#
+# Правило для «/» обязательно: путь «/» не совпадает ни с «/index.html»,
+# ни с «/*.html», и без него главная страница отдаётся с умолчанием
+# Workers (public, max-age=0) — то есть из кеша Cloudflare.
 /index.html
+  Cache-Control: no-cache, must-revalidate
+
+/
   Cache-Control: no-cache, must-revalidate
 
 /*.html
