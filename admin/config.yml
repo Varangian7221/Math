@@ -28,6 +28,12 @@ backend:
   base_url: https://decap-proxy.varangian7221.workers.dev
   auth_endpoint: /auth
 
+  # Если вход зависает на 60 секунд с «Request timed out after 60 seconds» —
+  # раскомментируйте и подставьте адрес своего Worker'а из
+  # cloudflare/api-proxy/worker.js (см. docs/ТАЙМАУТ_ВХОДА_API_GITHUB_COM.md).
+  # Без завершающего слэша.
+  # api_root: https://math-api-proxy.<ваш-поддомен>.workers.dev
+
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
