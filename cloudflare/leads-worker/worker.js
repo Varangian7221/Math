@@ -79,7 +79,7 @@ const CORS_HEADERS = {
 };
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (request.method === "OPTIONS") {
       const requested = request.headers.get("Access-Control-Request-Headers");
       return new Response(null, {
@@ -103,7 +103,7 @@ export default {
       if (request.method !== "POST") {
         return json({ ok: false, error: "Метод не поддерживается" }, 405);
       }
-      return receiveLead(request, env);
+      return receiveLead(request, env, ctx);
     }
 
     // / — проверка «жив ли» воркер
@@ -139,7 +139,7 @@ function getIp(request) {
 
 /* ------------------------------------------------------------- приём заявки */
 
-async function receiveLead(request, env) {
+async function receiveLead(request, env, ctx) {
   // 1. Запрос должен прийти с нашего домена
   const origin = request.headers.get("Origin") || "";
   const allowed = env.ALLOWED_ORIGIN || "";
@@ -225,13 +225,27 @@ async function receiveLead(request, env) {
 
   // 7. Уведомление в Telegram. Ошибка сюда не пробрасывается: заявка уже
   //    в базе, и показывать посетителю ошибку было бы неверно.
-  notify(env, { name, phone, grade, goal, page, id: info && info.meta && info.meta.last_row_id });
+  //
+  //    ctx.waitUntil обязателен. Без него Worker завершается сразу после
+  //    ответа, и fetch к Telegram просто не успевает уйти: заявка попадает
+  //    в базу, а уведомление молча теряется. С waitUntil среда дожидается
+  //    завершения фоновой задачи, даже если ответ уже отправлен.
+  const pending = notify(env, { name, phone, grade, goal, page, id: info && info.meta && info.meta.last_row_id });
+  if (ctx && ctx.waitUntil) {
+    ctx.waitUntil(pending);
+  } else {
+    await pending;   // без ctx (локальные тесты) — просто ждём
+  }
 
   return json({ ok: true, id: info && info.meta ? info.meta.last_row_id : null });
 }
 
 async function notify(env, lead) {
-  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return;
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) {
+    console.warn("telegram notify skipped: секреты не заданы",
+      { token: !!env.TELEGRAM_BOT_TOKEN, chatId: !!env.TELEGRAM_CHAT_ID });
+    return;
+  }
 
   const text = [
     "Новая заявка с сайта",
@@ -254,7 +268,14 @@ async function notify(env, lead) {
         body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text })
       }
     );
-    if (!r.ok) console.warn("telegram notify failed", r.status, (await r.text()).slice(0, 200));
+
+    if (!r.ok) {
+      // Telegram возвращает причину в теле — логируем её целиком,
+      // иначе в Logs видно только голый код 400/401 без объяснения
+      console.warn("telegram notify failed", r.status, (await r.text()).slice(0, 500));
+    } else {
+      console.log("telegram notify sent, chat", env.TELEGRAM_CHAT_ID);
+    }
   } catch (err) {
     console.warn("telegram notify error", err && err.message);
   }
