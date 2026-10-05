@@ -1,5 +1,5 @@
 -- Заявки с лендинга репетитора
--- Cloudflare Dashboard → D1 → Create database → SQL → вставить сюда → Execute
+-- Cloudflare Dashboard → D1 → ваша база → вкладка Console → сюда → Execute
 
 CREATE TABLE IF NOT EXISTS leads (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
