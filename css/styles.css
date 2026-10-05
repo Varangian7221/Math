@@ -205,10 +205,6 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 }
 .btn--ghost:hover{ background:var(--accent-soft); box-shadow:inset 0 0 0 1.5px var(--accent); }
 
-.btn--tg{ background:var(--tg); }
-.btn--tg:hover{ background:#1f92ce; }
-.btn--wa{ background:var(--wa); color:#08301a; }
-.btn--wa:hover{ background:#1fbb59; }
 
 .btn--link{
   background:none; padding:12px; width:100%;
@@ -653,7 +649,6 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 }
 .riskless b{ color:#fff; }
 
-.cta__messengers{ display:flex; flex-wrap:wrap; gap:12px; }
 .cta__or{ margin-top:18px; font-size:14px; color:rgba(255,255,255,.5); }
 
 /* Форма */
@@ -774,8 +769,6 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 }
 .stickybar.is-visible{ transform:translateY(0); }
 .stickybar .btn{ flex:1; padding:15px 14px; font-size:15.5px; }
-.btn--sticky-tg{ background:var(--tg); flex:0 0 auto !important; }
-.btn--sticky-tg span{ display:none; }
 
 /* ---------- 19. Анимации появления ----------
    Скрываем блоки только если JS работает: если скрипт не загрузился,
@@ -870,7 +863,7 @@ button,input,select,textarea{ font:inherit; color:inherit; }
   .faq__q{ padding:18px 20px; font-size:16px; }
   .faq__a{ padding:0 20px 20px; }
 
-  .cta__messengers .btn{ flex:1 1 100%; }
+
   .footer__inner{ grid-template-columns:1fr; }
   .footer__bottom{ justify-content:center; text-align:center; }
 }

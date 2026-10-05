@@ -199,46 +199,18 @@
   /* ======================================================================
      4. Отправка заявки
      ====================================================================== */
-  function composeMessage(d) {
-    var t = window.SITE.teacher || {};
-    return [
-      '📩 Новая заявка с сайта',
-      '',
-      '👤 Родитель: ' + d.name,
-      '📞 Телефон: ' + d.phone,
-      '🎓 Класс ученика: ' + d.grade,
-      '🎯 Цель: ' + d.goal,
-      '',
-      'Страница: ' + d.page
-    ].join('\n');
-  }
-
   /* Показ экрана «Заявка отправлена».
-     Кнопки календаря тут нет: ссылку на календарь репетитор присылает сам.
-     fbHref — адрес запасной кнопки «Отправить в Telegram». Если он не передан,
-     кнопка остаётся скрытой: это штатный путь, заявка уже в базе. */
-  function showDone(form, fbHref, fbText) {
+     Экран чисто информационный: ни календаря, ни кнопки отправки в мессенджер.
+     Ссылку на календарь и подтверждение репетитор присылает сам. */
+  function showDone(form) {
     var done = $('#form-done');
     if (!done) return;
-
-    var link = $('#fallback-tg-btn', done);
-    if (link) {
-      if (fbHref) {
-        link.href = fbHref;
-        link.textContent = fbText || link.textContent;
-        link.hidden = false;
-      } else {
-        link.hidden = true;
-        link.removeAttribute('href');
-      }
-    }
 
     if (form) form.hidden = true;
     done.hidden = false;
 
-    // Фокус: на запасную кнопку, если она есть, иначе на «ещё одну заявку»
-    var target = (link && !link.hidden) ? link : $('#form-reset', done);
-    if (target) target.focus({ preventScroll: true });
+    var again = $('#form-reset', done);
+    if (again) again.focus({ preventScroll: true });
   }
 
   function submitLead(data, form, status) {
@@ -249,94 +221,67 @@
 
     var endpoint = (window.SITE && window.SITE.leadsEndpoint) || '';
 
-    /* --- Вариант А: настроен Worker приёма заявок (основной) --- */
-    if (endpoint) {
-      var payload = {
-        name:  data.name,
-        phone: data.phone,
-        grade: data.grade,
-        goal:  data.goal,
-        page:  data.page,
-        // honeypot: человек сюда не попадёт, бот заполнит
-        website: (function () {
-          var hp = document.getElementById('website');
-          return hp ? hp.value : '';
-        })()
-      };
-
-      fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-        .then(function (r) {
-          return r.json().then(function (j) { return { ok: r.ok, body: j }; },
-                                function () { return { ok: false, body: {} }; });
-        })
-        .then(function (res) {
-          if (!res.ok) throw new Error((res.body && res.body.error) || 'Ошибка отправки');
-
-          if (btn) { btn.disabled = false; btn.textContent = initialText; }
-
-          // Экран «Заявка отправлена». Без кнопок: заявка уже в базе,
-          // ссылку на календарь репетитор пришлёт в Telegram.
-          // Текст подтверждения подставлен через data-field из админки.
-          showDone(form);
-        })
-        .catch(function (err) {
-          // Worker недоступен или сеть подвела — заявку не теряем,
-          // уходим в мессенджер с готовым текстом
-          if (status) {
-            status.classList.add('is-ok');
-            status.textContent = 'Не удалось отправить автоматически — отправьте заявку в Telegram.';
-          }
-          openTelegramFallback(data, form, btn, initialText, status, true);
-        });
+    /* Запасного пути через мессенджер больше нет: если Worker недоступен,
+       заявка в базу не попала. Показывать «Заявка отправлена» в этом случае
+       нельзя — посетитель будет ждать звонка, которого не будет. */
+    if (!endpoint) {
+      submitFailed(form, status, btn, initialText,
+                   'Форма сейчас не работает. Позвоните или напишите — контакты внизу страницы.');
       return;
     }
 
-    /* --- Вариант Б: Worker не настроен — заявка уходит в Telegram в один тап --- */
-    if (status) {
-      status.textContent = 'Заявка готова — нажмите кнопку ниже, чтобы отправить её в Telegram.';
-    }
-    openTelegramFallback(data, form, btn, initialText, status, true);
+    var payload = {
+      name:  data.name,
+      phone: data.phone,
+      grade: data.grade,
+      goal:  data.goal,
+      page:  data.page,
+      // honeypot: человек сюда не попадёт, бот заполнит
+      website: (function () {
+        var hp = document.getElementById('website');
+        return hp ? hp.value : '';
+      })()
+    };
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) {
+        return r.json().then(function (j) { return { ok: r.ok, body: j }; },
+                              function () { return { ok: false, body: {} }; });
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error((res.body && res.body.error) || 'Ошибка отправки');
+
+        if (btn) { btn.disabled = false; btn.textContent = initialText; }
+
+        // Экран «Заявка отправлена». Без кнопок: заявка уже в базе,
+        // ссылку на календарь репетитор пришлёт в Telegram.
+        // Текст подтверждения подставлен через data-field из админки.
+        showDone(form);
+      })
+      .catch(function (err) {
+        // Worker недоступен, сеть подвела или он ответил ошибкой.
+        // Заявки в базе нет, поэтому экран успеха не показываем —
+        // форма остаётся заполненной, чтобы можно было повторить.
+        submitFailed(form, status, btn, initialText,
+          'Не получилось отправить заявку. Проверьте интернет и попробуйте ещё раз' +
+          ' или позвоните по номеру внизу страницы.');
+      });
   }
 
-  function openTelegramFallback(data, form, btn, initialText, status, autoOpen) {
-    var link = (window.SITE.contacts && window.SITE.contacts.telegram) || 'https://t.me/username';
-    var withText = link + '?text=' + encodeURIComponent(composeMessage(data));
-
+  /* Откат после неудачной отправки: разблокируем кнопку, оставляем
+     заполненную форму и показываем текст ошибки под полями. */
+  function submitFailed(form, status, btn, initialText, message) {
     if (btn) { btn.disabled = false; btn.textContent = initialText; }
-
     if (status) {
-      status.classList.add('is-ok');
-      status.textContent = 'Заявка готова — нажмите кнопку ниже, чтобы отправить её в Telegram.';
+      status.classList.remove('is-ok');
+      status.textContent = message;
     }
-
-    if (!autoOpen) return;
-
-    // Текст кнопки берём из контента (админка), с запасным вариантом
-    var tgBtnText = getContent('form.telegramBtn') || 'Отправить заявку в Telegram';
-
-    // Экран успеха показываем сразу, а саму отправку подтверждает кнопка:
-    // так заявка точно не потеряется, даже если мессенджер открылся не с первого раза.
-    showDone(form, withText, tgBtnText);
-
-    var win = window.open(withText, '_blank');
-    if (!win) {
-      // Всплывающие окна заблокированы — подводим кнопку поближе
-      var doneLink = $('#fallback-tg-btn');
-      if (doneLink && !doneLink.hidden) doneLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
-
-  /* Чтение значения из контента (подставленного сервером или через content.json) */
-  function getContent(path) {
-    var c = window.__CONTENT__;
-    if (!c) return '';
-    return String(path).split('.').reduce(function (o, k) {
-      return (o === null || o === undefined) ? '' : o[k];
-    }, c);
+    var phone = $('#phone');
+    if (phone) phone.focus({ preventScroll: true });
   }
 
   // Кнопка «Отправить ещё одну заявку»
@@ -355,14 +300,7 @@
         var s = $('#submit-btn'); if (s) s.disabled = false;
         var n = $('#name'); if (n) n.focus();
       }
-      if (done) {
-        done.hidden = true;
-        var c = $('#fallback-tg-btn', done);
-        if (c) {
-          c.hidden = true;
-          c.removeAttribute('href');
-        }
-      }
+      if (done) done.hidden = true;
     });
   })();
 

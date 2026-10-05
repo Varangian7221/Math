@@ -623,11 +623,7 @@
           <label class="f"><span class="f__label">Снятие риска — заголовок</span><input class="f__input" data-path="cta.riskTitle" type="text"></label>
           <label class="f"><span class="f__label">Снятие риска — текст</span><textarea class="f__input f__input--area" data-path="cta.riskText" rows="3"></textarea></label>
         </div>
-        <div class="grid2">
-          <label class="f"><span class="f__label">Кнопка Telegram</span><input class="f__input" data-path="cta.telegramBtn" type="text"></label>
-          <label class="f"><span class="f__label">Кнопка WhatsApp</span><input class="f__input" data-path="cta.whatsappBtn" type="text"></label>
-        </div>
-        <label class="f"><span class="f__label">Подпись под кнопками</span><input class="f__input" data-path="cta.or" type="text"></label>
+        <label class="f"><span class="f__label">Подпись перед формой</span><input class="f__input" data-path="cta.or" type="text"></label>
       </div>
     </details>
 
@@ -644,16 +640,13 @@
           <span class="f__label">Текст после отправки</span>
           <textarea class="f__input f__input--area" data-path="form.successText" rows="2"></textarea>
         </label>
-        <div class="grid2">
-          <label class="f"><span class="f__label">Кнопка Telegram (запасная)</span><input class="f__input" data-path="form.telegramBtn" type="text"></label>
-        </div>
         <label class="f"><span class="f__label">Ссылка «Политика конфиденциальности»</span><input class="f__input" data-path="form.privacyLabel" type="text"></label>
         <label class="f"><span class="f__label">Текст в подвале</span><textarea class="f__input f__input--area" data-path="footer.about" rows="3"></textarea></label>
         <label class="f"><span class="f__label">Конец копирайта</span><input class="f__input" data-path="footer.copyright" type="text"></label>
 
         <h3 class="sub">Настройки Telegram-бота</h3>
         <p class="sub__note">Это технические настройки — в файле <code>js/config.js</code>. В админке они не меняются, чтобы не сломать отправку заявок.</p>
-        <p class="sub__note">Если бот настроен, заявки приходят вам в Telegram автоматически. Если нет — посетителю показывается кнопка «Отправить в Telegram» с готовым текстом.</p>
+        <p class="sub__note">Заявка уходит в Worker, он пишет её в базу D1 и присылает вам уведомление в Telegram. Если Worker недоступен, посетитель видит просьбу повторить отправку — заявка при этом не теряется.</p>
       </div>
     </details>
 
