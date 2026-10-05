@@ -3,8 +3,8 @@
 Одностраничный сайт из 11 блоков. Чистые HTML/CSS/JS — без сборки, без фреймворков,
 без `npm install`. Открывается двойным кликом по `index.html`.
 
-Деплой: **https://mathlastname.netlify.app**
-Админка (Decap CMS): **https://mathlastname.netlify.app/admin/**
+Деплой: **https://math-tutor.varangian7221.workers.dev**
+Админка (Decap CMS): **https://math-tutor.varangian7221.workers.dev/admin/**
 
 ---
 
@@ -21,14 +21,17 @@ Math/
 │   └── admin.css       — стили Node-админки
 ├── js/
 │   ├── content.js      — подстановка контента + генерация Schema.org
-│   ├── config.js       — ТОЛЬКО техданные: токен бота, chatId, календарь
-│   ├── script.js       — маска телефона, валидация, отправка в Telegram, sticky bar
+│   ├── config.js       — ТОЛЬКО техданные: адрес Worker заявок, календарь, соцсети
+│   ├── script.js       — маска телефона, валидация, отправка заявки, sticky bar
 │   └── admin.js        — логика Node-админки
-├── admin/                  ← ДЕКАП CMS (для Netlify)
+├── admin/                  ← ДЕКАП CMS (вход через GitHub OAuth)
 │   ├── index.html
 │   └── config.yml      — схема всех полей
 ├── admin-node.html         ← NODE-АДМИНКА (для хостингов с Node)
 ├── server.js            ← статика + API для Node-админки
+├── cloudflare/
+│   ├── api-proxy/      — Worker-прокси для api.github.com (нужен, если вход в CMS висит)
+│   └── leads-worker/   — Worker приёма заявок: worker.js + schema.sql для D1
 ├── images/
 └── docs/                ← служебные инструкции по деплою и трублюшнгу
 ```
@@ -41,15 +44,15 @@ Math/
 
 | Хостинг | Адрес | Технология |
 |---|---|---|
-| Netlify (ваш текущий) | `/admin/` | Decap CMS + Netlify Identity (Git Gateway) |
+| Cloudflare Workers (ваш текущий) | `/admin/` | Decap CMS + вход через GitHub OAuth |
 | Render / Railway / VPS | `/admin-node.html` | Своя админка, вход по паролю |
 
 Обе редактируют **весь текст сайта + фотографии** и пишут в `data/content.json`.
 
 ### Вариант Б — вручную в `data/content.json`
 
-Файл читается и лендингом, и админкой. Правьте JSON, коммитьте — Netlify
-пересоберёт сайт за 30–90 секунд.
+Файл читается и лендингом, и админкой. Правьте JSON, коммитьте, затем нажмите
+**Deploy** в дашборде Workers — push в GitHub сам по себе сайт не пересобирает.
 
 ### Как это работает на странице
 
@@ -57,7 +60,7 @@ Math/
 
 1. **Node-хостинг** — `server.js` подставляет `window.__CONTENT__` прямо в HTML
    (нет мигания пустых блоков, весь текст виден поисковикам).
-2. **Статика (Netlify)** — `fetch('data/content.json')`.
+2. **Статика (Cloudflare Workers)** — `fetch('data/content.json')`.
 3. **`file://`** — берёт тексты из самого HTML.
 
 Разметка помечена атрибутом `data-field="путь.к.полю"` — это единый контракт
@@ -87,22 +90,23 @@ Math/
 
 ---
 
-## 🤖 Telegram-форма
+## 📥 Заявки с формы
 
-1. `@BotFather` → `/newbot` → скопируйте токен.
-2. Напишите боту любое сообщение (чтобы он «увидел» чат).
-3. Откройте `https://api.telegram.org/bot<ТОКЕН>/getUpdates`, найдите `"chat":{"id": ...}`.
-4. Впишите оба значения в `js/config.js`:
+Заявка попадает в базу Cloudflare D1 и приходит уведомлением в Telegram.
+Развёртывание по шагам — [`docs/СБОР_ЗАЯВОК_С_ФОРМЫ.md`](docs/СБОР_ЗАЯВОК_С_ФОРМЫ.md).
+
+В `js/config.js` вписывается только адрес Worker:
 
 ```js
-telegramBot: {
-  token:  '7123456789:AAH...',
-  chatId: '123456789'
-}
+leadsEndpoint: 'https://math-leads.<поддомен>.workers.dev/api/lead',
 ```
 
-Если оставить пустыми — форма всё равно работает: посетитель получит готовое
-сообщение и кнопку «Отправить заявку в Telegram».
+**Токен бота в `js/config.js` не вписывается.** Этот файл публичный — токен
+виден каждому посетителю в DevTools, и по нему можно писать от вашего имени.
+Токен живёт в секретах Worker.
+
+Пока `leadsEndpoint` пустой, форма работает по-старому: посетителю
+показывается готовое сообщение, и он отправляет его в Telegram одним нажатием.
 
 Ссылка на календарь после отправки — `calendar` в том же файле.
 
@@ -121,9 +125,9 @@ API: `/api/content` (GET/PUT), `/api/login`, `/api/logout`, `/api/session`,
 `/api/upload`, `/api/reset`.
 
 > ⚠️ **Имя файла `admin-node.html` — не переименовывайте обратно в `admin.html`.**
-> Netlify отдаёт по адресу `/admin/` корневой `admin.html` (его «Pretty URLs»
-> имеют приоритет над папкой `admin/`), и вместо CMS вы видели Node-админку,
-> которая пыталась дёрнуть несуществующий `/api/session`.
+> Статический хостинг отдаёт по адресу `/admin/` корневой `admin.html` вместо
+> папки `admin/`, и вместо CMS вы видели Node-админку, которая пыталась дёрнуть
+> несуществующий `/api/session`.
 
 ---
 
@@ -131,9 +135,11 @@ API: `/api/content` (GET/PUT), `/api/login`, `/api/logout`, `/api/session`,
 
 - [ ] `ADMIN_PASSWORD` задан (не `admin`) — только для Node-хостинга
 - [ ] В `canonical` / `og:url` / `og:image` в `<head>` — ваш домен вместо `math-smirnova.ru`
-- [ ] Токен и `chatId` Telegram-бота в `js/config.js`
+- [ ] Задеплоен Worker приёма заявок, `leadsEndpoint` в `js/config.js` заполнен
+- [ ] Заданы секреты Worker: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `LEADS_TOKEN`
 - [ ] `teacher-1.webp` и `teacher-2.webp` вместо SVG-заглушек
-- [ ] Домен подключён к Netlify (SSL бесплатный, выдаётся автоматически)
+- [ ] Сайт задеплоен в Workers вручную (push в GitHub этого не делает)
+- [ ] Домен подключён к Cloudflare (SSL бесплатный, выдаётся автоматически)
 
 ---
 
@@ -151,11 +157,12 @@ API: `/api/content` (GET/PUT), `/api/login`, `/api/logout`, `/api/session`,
 
 | Файл | О чём |
 |---|---|
-| `docs/НАСТРОЙКА_ВХОДА_В_АДМИНКУ.md` | **← настройка входа в `/admin/` на Netlify** |
-| `docs/РАЗВЁРТЫВАНИЕ_CLOUDFLARE_PAGES.md` | **← перенос на Cloudflare Pages** |
+| `docs/СБОР_ЗАЯВОК_С_ФОРМЫ.md` | **← приём заявок в D1 + Telegram: развёртывание Worker** |
+| `docs/ТАЙМАУТ_ВХОДА_API_GITHUB_COM.md` | **← вход в админку висит 60 секунд** |
+| `docs/РАЗВЁРТЫВАНИЕ_CLOUDFLARE_PAGES.md` | перенос на Cloudflare (первый раздел устарел — описывает Pages) |
 | `docs/ИНСТРУКЦИЯ_ЗАГРУЗКИ_РЕПОЗИТОРИЯ_GITHUB.md` | как залить проект на GitHub |
-| `docs/КОНФЛИКТ_ADMIN_HTML_VS_DECAP_CMS.md` | почему `/admin/` показывал не ту админку |
 | остальные `*.md` | история неудачных попыток настроить вход |
 
-> ⚠️ Остальные файлы в `docs/` **устарели** — они описывают проблемы, которые на
-> самом деле вызывались багом с `/admin/` (см. `docs/КОНФЛИКТ_ADMIN_HTML_VS_DECAP_CMS.md`).
+> ⚠️ Файлы про Netlify Identity и Cloudflare Pages **устарели** — схема деплоя
+> другая: сайт живёт в Worker со статическими файлами, а вход в админку идёт
+> через собственный OAuth-прокси. Ориентируйтесь на два файла в таблице выше.

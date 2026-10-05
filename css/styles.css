@@ -710,6 +710,14 @@ button,input,select,textarea{ font:inherit; color:inherit; }
   width:19px; height:19px; margin:1px 0 0; flex:none;
   accent-color:var(--accent); cursor:pointer;
 }
+
+/* Honeypot — ловушка для ботов.
+   Уводим за границы экрана, а не display:none: часть ботов пропускает
+   невидимые поля, зато не может «увидеть» элемент, лежащий вне вьюпорта. */
+.hp{
+  position:absolute; left:-9999px; top:auto;
+  width:1px; height:1px; overflow:hidden;
+}
 .form__status{
   margin-top:14px; font-size:14.5px; font-weight:600; text-align:center;
   color:#d64545;

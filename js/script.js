@@ -234,37 +234,62 @@
 
   function submitLead(data, form, status) {
     var btn = $('#submit-btn');
-    var bot = (window.SITE && window.SITE.telegramBot) || {};
     var initialText = btn ? btn.textContent : '';
 
     if (btn) { btn.disabled = true; btn.textContent = 'Отправляю…'; }
 
-    /* --- Вариант А: бот настроен, заявка идёт напрямую в Telegram --- */
-    if (bot.token && bot.chatId) {
-      fetch('https://api.telegram.org/bot' + bot.token + '/sendMessage', {
+    var endpoint = (window.SITE && window.SITE.leadsEndpoint) || '';
+
+    /* --- Вариант А: настроен Worker приёма заявок (основной) --- */
+    if (endpoint) {
+      var payload = {
+        name:  data.name,
+        phone: data.phone,
+        grade: data.grade,
+        goal:  data.goal,
+        page:  data.page,
+        // honeypot: человек сюда не попадёт, бот заполнит
+        website: (function () {
+          var hp = document.getElementById('website');
+          return hp ? hp.value : '';
+        })()
+      };
+
+      fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: bot.chatId,
-          // без parse_mode: текст отправляется как есть, спецсимволы в имени
-          // или телефоне не сломают запрос к Telegram
-          text: composeMessage(data)
-        })
+        body: JSON.stringify(payload)
       })
-        .then(function (r) { return r.json(); })
-        .then(function (res) {
-          if (!res || !res.ok) throw new Error('telegram error');
-          if (btn) { btn.disabled = false; btn.textContent = initialText; }
-          showDone(form, (window.SITE && window.SITE.calendar) || '#contact', 'Выбрать время в календаре');
+        .then(function (r) {
+          return r.json().then(function (j) { return { ok: r.ok, body: j }; },
+                                function () { return { ok: false, body: {} }; });
         })
-        .catch(function () {
-          // Сеть или Telegram недоступны — заявку не теряем, уходим в мессенджер
+        .then(function (res) {
+          if (!res.ok) throw new Error((res.body && res.body.error) || 'Ошибка отправки');
+
+          if (btn) { btn.disabled = false; btn.textContent = initialText; }
+
+          // Экран «Заявка отправлена» + ссылка на календарь.
+          // Текст подтверждения подставлен через data-field из админки.
+          showDone(form, (window.SITE && window.SITE.calendar) || '#contact',
+                       getContent('form.calendarBtn') || 'Выбрать время в календаре');
+        })
+        .catch(function (err) {
+          // Worker недоступен или сеть подвела — заявку не теряем,
+          // уходим в мессенджер с готовым текстом
+          if (status) {
+            status.classList.add('is-ok');
+            status.textContent = 'Не удалось отправить автоматически — отправьте заявку в Telegram.';
+          }
           openTelegramFallback(data, form, btn, initialText, status, true);
         });
       return;
     }
 
-    /* --- Вариант Б: бот не настроен — заявка уходит в Telegram в один тап --- */
+    /* --- Вариант Б: Worker не настроен — заявка уходит в Telegram в один тап --- */
+    if (status) {
+      status.textContent = 'Заявка готова — нажмите кнопку ниже, чтобы отправить её в Telegram.';
+    }
     openTelegramFallback(data, form, btn, initialText, status, true);
   }
 

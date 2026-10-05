@@ -561,6 +561,13 @@
         </label>
         <p class="field__error" data-error-for="consent"></p>
 
+        <!-- Honeypot: скрыт от людей, заполняют только боты. Наличие поля
+             проверяет Worker — см. cloudflare/leads-worker/worker.js -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Не заполняйте это поле</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
         <button class="btn btn--primary btn--lg btn--full" type="submit" id="submit-btn" data-field="form.submit">Записаться на бесплатную диагностику</button>
 
         <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
