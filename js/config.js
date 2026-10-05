@@ -37,9 +37,11 @@ window.SITE = {
 
   /* ---------- Приём заявок с формы ----------
      Адрес Worker'а из cloudflare/leads-worker/worker.js.
-     Пока пусто — заявка не уходит сама: посетителю показывается
+     Worker пишет заявку в D1 и присылает уведомление в Telegram.
+
+     Если адрес пустой, заявка не уходит сама: посетителю показывается
      готовое сообщение для отправки в Telegram в один тап. */
-  leadsEndpoint: '',   // например: https://math-leads.<поддомен>.workers.dev/api/lead
+  leadsEndpoint: 'https://math-leads.varangian7221.workers.dev/api/lead',
 
   /* ---------- Telegram-бот ----------
      ТОКЕН СЮДА НЕ ВПИСЫВАТЬ.
