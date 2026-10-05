@@ -47,8 +47,6 @@
       $$('a[href^="tel:"]').forEach(function (a) { a.href = 'tel:' + telHref; });
     }
 
-    var cal = $('#calendar-btn');
-    if (cal && CFG.calendar) cal.href = CFG.calendar;
   })();
 
   /* ======================================================================
@@ -215,21 +213,32 @@
     ].join('\n');
   }
 
-  /* Показ экрана «Заявка отправлена». btnHref — куда ведёт кнопка на этом экране.
-     Текст подтверждения уже подставлен через data-field из контента. */
-  function showDone(form, btnHref, btnText) {
+  /* Показ экрана «Заявка отправлена».
+     Кнопки календаря тут нет: ссылку на календарь репетитор присылает сам.
+     fbHref — адрес запасной кнопки «Отправить в Telegram». Если он не передан,
+     кнопка остаётся скрытой: это штатный путь, заявка уже в базе. */
+  function showDone(form, fbHref, fbText) {
     var done = $('#form-done');
     if (!done) return;
 
-    var link = $('a', done);
+    var link = $('#fallback-tg-btn', done);
     if (link) {
-      link.href = btnHref || (window.SITE && window.SITE.calendar) || '#contact';
-      link.textContent = btnText || link.textContent;
+      if (fbHref) {
+        link.href = fbHref;
+        link.textContent = fbText || link.textContent;
+        link.hidden = false;
+      } else {
+        link.hidden = true;
+        link.removeAttribute('href');
+      }
     }
 
     if (form) form.hidden = true;
     done.hidden = false;
-    if (link) link.focus({ preventScroll: true });
+
+    // Фокус: на запасную кнопку, если она есть, иначе на «ещё одну заявку»
+    var target = (link && !link.hidden) ? link : $('#form-reset', done);
+    if (target) target.focus({ preventScroll: true });
   }
 
   function submitLead(data, form, status) {
@@ -269,10 +278,10 @@
 
           if (btn) { btn.disabled = false; btn.textContent = initialText; }
 
-          // Экран «Заявка отправлена» + ссылка на календарь.
+          // Экран «Заявка отправлена». Без кнопок: заявка уже в базе,
+          // ссылку на календарь репетитор пришлёт в Telegram.
           // Текст подтверждения подставлен через data-field из админки.
-          showDone(form, (window.SITE && window.SITE.calendar) || '#contact',
-                       getContent('form.calendarBtn') || 'Выбрать время в календаре');
+          showDone(form);
         })
         .catch(function (err) {
           // Worker недоступен или сеть подвела — заявку не теряем,
@@ -306,9 +315,8 @@
 
     if (!autoOpen) return;
 
-    // Тексты кнопок берём из контента (админка), с запасным вариантом
+    // Текст кнопки берём из контента (админка), с запасным вариантом
     var tgBtnText = getContent('form.telegramBtn') || 'Отправить заявку в Telegram';
-    var calBtnText = getContent('form.calendarBtn') || 'Выбрать время в календаре';
 
     // Экран успеха показываем сразу, а саму отправку подтверждает кнопка:
     // так заявка точно не потеряется, даже если мессенджер открылся не с первого раза.
@@ -317,8 +325,8 @@
     var win = window.open(withText, '_blank');
     if (!win) {
       // Всплывающие окна заблокированы — подводим кнопку поближе
-      var doneLink = $('#form-done a');
-      if (doneLink) doneLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var doneLink = $('#fallback-tg-btn');
+      if (doneLink && !doneLink.hidden) doneLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 
@@ -349,10 +357,10 @@
       }
       if (done) {
         done.hidden = true;
-        var c = $('a', done);
+        var c = $('#fallback-tg-btn', done);
         if (c) {
-          c.href = (window.SITE && window.SITE.calendar) || '#contact';
-          c.textContent = 'Выбрать время в календаре';
+          c.hidden = true;
+          c.removeAttribute('href');
         }
       }
     });

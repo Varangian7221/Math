@@ -577,7 +577,9 @@
         <span class="done__mark" aria-hidden="true">✓</span>
         <h3 class="form__title">Заявка отправлена</h3>
         <p class="done__text" data-field="form.successText">Спасибо! Отвечу вам в течение 15 минут и пришлю ссылку на календарь для выбора удобного времени.</p>
-        <a class="btn btn--primary btn--full" id="calendar-btn" href="#" target="_blank" rel="noopener" data-field="form.calendarBtn">Выбрать время в календаре</a>
+        <!-- Показывается только если Worker недоступен и заявку нужно
+             отправить вручную. На штатном пути (Worker ответил) кнопки нет. -->
+        <a class="btn btn--primary btn--full" id="fallback-tg-btn" href="#" target="_blank" rel="noopener" hidden data-field="form.telegramBtn">Отправить заявку в Telegram</a>
         <button class="btn btn--link" type="button" id="form-reset">Отправить ещё одну заявку</button>
       </div>
     </div>

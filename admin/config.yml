@@ -289,8 +289,7 @@ collections:
               - { label: "Заголовок формы", name: "title", widget: "string" }
               - { label: "Кнопка отправки", name: "submit", widget: "string" }
               - { label: "Текст после отправки", name: "successText", widget: "text" }
-              - { label: "Кнопка календаря", name: "calendarBtn", widget: "string" }
-              - { label: "Кнопка Telegram (после отправки)", name: "telegramBtn", widget: "string" }
+              - { label: "Кнопка Telegram (запасная, если Worker недоступен)", name: "telegramBtn", widget: "string" }
               - { label: "Текст «Политика конфиденциальности»", name: "privacyLabel", widget: "string" }
           - label: "Подвал"
             name: "footer"
