@@ -18,11 +18,12 @@
  * РАЗВЁРТЫВАНИЕ
  *
  * 1. Создать базу:
- *      Cloudflare Dashboard → Workers & Pages → D1 → Create database → SQL
- *      вставить содержимое schema.sql из этой папки → Execute
+ *      Dashboard → D1 SQL Database → Create Database → открыть базу →
+ *      вкладка Console → вставить schema.sql из этой папки → Execute
  *
  * 2. Задеплоить Worker:
- *      Create → Worker → Edit code → вставить этот файл → Deploy
+ *      Dashboard → Workers & Pages → Create → Worker → имя math-leads →
+ *      Deploy → Edit code (</>) → вставить этот файл → Save and deploy
  *      затем привязать базу: Settings → Bindings → Add → D1 database
  *      переменная: DB
  *
